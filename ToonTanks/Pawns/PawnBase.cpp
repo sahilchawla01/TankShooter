@@ -23,4 +23,29 @@ APawnBase::APawnBase()
 	ProjectileSpawnPoint->SetupAttachment(TurrentMesh);
 }
 
+void APawnBase::RotateTurrent(FVector LookAtTarget)
+{
+	//Update turrent rotation to look at target
+	FVector LookAtTargetClean = FVector(LookAtTarget.X, LookAtTarget.Y, TurrentMesh->GetComponentLocation().Z); //cleans LookAtTarget so we don't have weird rotations
+	FVector StartLocation = TurrentMesh->GetComponentLocation();
+	FRotator TurrentRotation = FVector(LookAtTargetClean - StartLocation).Rotation();
+
+	TurrentMesh->SetWorldRotation(TurrentRotation);
+
+}
+
+void APawnBase::Fire()
+{
+
+}
+
+void APawnBase::HandleDestruction()
+{
+	//Play death effects particle, sound and camera shake
+
+	//Child overrides:
+	//PawnTurrent Turrent died
+	//PawnTank Player died, hide all visual components and stop movement input
+}
+
 
