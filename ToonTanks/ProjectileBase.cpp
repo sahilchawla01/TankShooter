@@ -13,10 +13,14 @@ AProjectileBase::AProjectileBase()
 	PrimaryActorTick.bCanEverTick = false;
 
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Mesh"));
-	ProjectileMesh->OnComponentHit.AddDynamic(this, &AProjectileBase::OnHit);
+	
 	RootComponent = ProjectileMesh;
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
+
+	ProjectileMovement->InitialSpeed = MovementSpeed;
+	ProjectileMovement->MaxSpeed = MovementSpeed;
+	InitialLifeSpan = 2.f;
 
 	
 }
@@ -25,29 +29,22 @@ AProjectileBase::AProjectileBase()
 void AProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	ProjectileMovement->InitialSpeed = MovementSpeed;
-	ProjectileMovement->MaxSpeed = MovementSpeed;
-	InitialLifeSpan = 3.f;
-	
+	ProjectileMesh->OnComponentHit.AddDynamic(this , &AProjectileBase::OnHit);
 }
 
-// Called every frame
-void AProjectileBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
-}
 void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	AActor* ThisActor = GetOwner();
 
+	UE_LOG(LogTemp, Error, TEXT("OnHit"));
 	if(!ThisActor)
 		return;
 	
 	if(OtherActor && OtherActor != this && OtherActor != ThisActor) //If the actor isn't self and exists
 	{
-		UGameplayStatics::ApplyDamage(OtherActor, Damage, MyOwner->GetInstigatorController(), DamageType);
+		UE_LOG(LogTemp, Error, TEXT("Actor itself"));
+		UGameplayStatics::ApplyDamage(OtherActor, Damage, ThisActor->GetInstigatorController(), this, DamageType);
 	}
 	Destroy();
 }

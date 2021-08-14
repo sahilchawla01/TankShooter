@@ -25,12 +25,14 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* ProjectileSpawnPoint;
 	//Variables
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AProjectileBase> ProjectileClass;
 
 public:
 	// Sets default values for this pawn's properties
 	APawnBase();
+	
+	virtual void HandleDestruction();
 
 protected:
 
@@ -39,7 +41,7 @@ protected:
 
 	void Fire();
 
-	virtual void HandleDestruction();
+	
 
 	
 
