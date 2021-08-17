@@ -28,7 +28,7 @@ void APawnTurrent::Tick(float DeltaTime)
 
 void APawnTurrent::CheckFireCondition()
 {
-    if(!PlayerPawn) //ded
+    if(!PlayerPawn || !PlayerPawn->GetIsPlayerAlive()) //ded
         return;
 
     if(ReturnDistanceToPlayer() <= Range)
@@ -53,5 +53,7 @@ void APawnTurrent::HandleDestruction()
 {
     //Call base for playing effects
     Super::HandleDestruction();
+
     Destroy();
+    
 }

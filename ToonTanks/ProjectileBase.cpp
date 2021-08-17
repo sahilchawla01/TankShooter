@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystemComponent.h"
 
 // Sets default values
 AProjectileBase::AProjectileBase()
@@ -18,6 +19,9 @@ AProjectileBase::AProjectileBase()
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
 
+	ParticleTrail = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Particle Trail"));
+	ParticleTrail->SetupAttachment(RootComponent);
+
 	ProjectileMovement->InitialSpeed = MovementSpeed;
 	ProjectileMovement->MaxSpeed = MovementSpeed;
 	InitialLifeSpan = 2.f;
@@ -29,6 +33,7 @@ AProjectileBase::AProjectileBase()
 void AProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
+	UGameplayStatics::PlaySoundAtLocation(this, LaunchSound, GetActorLocation());
 	ProjectileMesh->OnComponentHit.AddDynamic(this , &AProjectileBase::OnHit);
 }
 
@@ -36,6 +41,7 @@ void AProjectileBase::BeginPlay()
 void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	AActor* ThisActor = GetOwner();
+
 
 	UE_LOG(LogTemp, Error, TEXT("OnHit"));
 	if(!ThisActor)
@@ -45,7 +51,11 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 	{
 		UE_LOG(LogTemp, Error, TEXT("Actor itself"));
 		UGameplayStatics::ApplyDamage(OtherActor, Damage, ThisActor->GetInstigatorController(), this, DamageType);
+		UGameplayStatics::PlaySoundAtLocation(this, HitSound, OtherActor->GetActorLocation());
+		UGameplayStatics::SpawnEmitterAtLocation(this, HitParticle, GetActorLocation());
+		GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(HitShake);
+		Destroy();
 	}
-	Destroy();
+	
 }
 
